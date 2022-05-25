@@ -51,3 +51,42 @@ exports.signup = (req, res, next) => {
     });
   });
 };
+
+exports.login = (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  let loadedUser;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "Please Enter All fields" });
+  }
+
+  User.findOne({ email: email }).then((user) => {
+    if (!user) {
+      return res.status(400).json({ message: "Could not find the user" });
+    }
+
+    bcrypt.compare(password, user.password).then((isMatch) => {
+      if (!isMatch)
+        return res.status(400).json({ message: "Incorrect Email or Password" });
+
+      jwt.sign(
+        {
+          id: user.id,
+        },
+        config.get("secret"),
+        { expiresIn: 3600 },
+        (err, token) => {
+          if (err) throw err;
+          res.json({
+            token,
+            user: {
+              id: user.id,
+              email: user.email,
+            },
+          });
+        }
+      );
+    });
+  });
+};
