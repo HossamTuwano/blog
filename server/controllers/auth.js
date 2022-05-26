@@ -55,7 +55,6 @@ exports.signup = (req, res, next) => {
 exports.login = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  let loadedUser;
 
   if (!email || !password) {
     return res.status(400).json({ message: "Please Enter All fields" });
