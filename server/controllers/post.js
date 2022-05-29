@@ -1,10 +1,15 @@
 const Post = require("../models/post");
 
 exports.addPost = (req, res, next) => {
+  if (!req.file) {
+    const error = new Error("Image not uploaded");
+    error.statusCode = 422;
+    throw error;
+  }
   const title = req.body.title;
   const body = req.body.body;
   const author = req.body.author;
-  const image = req.file;
+  const image = req.file.path;
 
   const post = new Post({
     title: title,
