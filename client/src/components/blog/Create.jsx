@@ -7,6 +7,7 @@ function Create() {
     title: "",
     author: "hossam",
     body: "",
+    image: "",
   });
   const [isPending, setIsPending] = useState(false);
 
@@ -15,15 +16,21 @@ function Create() {
     setIsPending(true);
     const result = Object.assign(post);
 
+    const formData = new FormData();
+    formData.append("title", post.title);
+    formData.append("auther", post.author);
+    formData.append("body", post.body);
+    formData.append("image", post.image);
+
     const blog = async () => {
       try {
         const res = await fetch("http://localhost:5000/add-post", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(result),
-        }).then(() => {
-          setIsPending(false);
+          body: formData,
         });
+        const data = await res.json();
+        setPost(data);
+        console.log(data);
       } catch (err) {
         console.log(err);
       }
@@ -32,18 +39,38 @@ function Create() {
     console.log(post);
   };
 
+  const handleChange = (e) => {
+    setPost({ ...post, [e.target.name]: e.target.value });
+  };
+
+  const handleImage = (e) => {
+    setPost({...post, image: e.target.files[0]})
+  }
+
   return (
     <div className="flex justify-center">
       <div className="w-[750px] mt-20">
         <form onSubmit={handleSubmit} className="flex flex-col">
           <div>
+
+          <div className="">
+              <input
+                type="text"
+                required
+                value={post.author}
+                name="author"
+                onChange={handleChange}
+                placeholder="author"
+                className="border-0 outline-none placeholder-gray-500 text-5xl"
+              />
+            </div>
             <div className="">
               <input
                 type="text"
                 required
                 value={post.title}
                 name="title"
-                onChange={(e) => setPost({ ...post, title: e.target.value })}
+                onChange={handleChange}
                 placeholder="Title"
                 className="border-0 outline-none placeholder-gray-500 text-5xl"
               />
@@ -53,21 +80,24 @@ function Create() {
               <textarea
                 required
                 value={post.body}
-                onChange={(e) => setPost({ ...post, body: e.target.value })}
+                onChange={handleChange}
                 className="resize-none px-2 py-3"
+                name="body"
                 rows={10}
                 cols={100}
               />
             </div>
+
+            <div>
+              <input
+                type="file"
+                name="image"
+                required
+                onChange={handleImage}
+              />
+            </div>
           </div>
 
-          {/* <label>Blog author:</label>
-          <select
-            value={post.author}
-            onChange={(e) => setPost({ ...post, author: e.target.value })}
-          >
-            <option value={post.author}>{post.author}</option>
-          </select> */}
           {!isPending && (
             <div className="bg-green-400 w-[80px]  h-6 rounded-xl">
               <button className="border-0 w-[80px] h-full text-white">
@@ -75,7 +105,6 @@ function Create() {
               </button>
             </div>
           )}
-          {/* {isPending && <button disabled>Adding Blog</button>} */}
         </form>
       </div>
     </div>

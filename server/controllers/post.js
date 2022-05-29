@@ -1,12 +1,16 @@
 const Post = require("../models/post");
 
 exports.addPost = (req, res, next) => {
-  const { title, body, author } = req.body;
+  const title = req.body.title;
+  const body = req.body.body;
+  const author = req.body.author;
+  const image = req.file;
 
   const post = new Post({
     title: title,
     body: body,
     author: author,
+    image: image,
   });
 
   post
@@ -22,7 +26,9 @@ exports.getSinglePost = (req, res) => {
       res.status(400).json({ success: false, message: "post not found" });
     }
     if (post) {
-      res.status(201).json({ success: true, message: "post found", post: post });
+      res
+        .status(201)
+        .json({ success: true, message: "post found", post: post });
     }
   });
 };
