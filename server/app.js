@@ -6,14 +6,14 @@ const cors = require("cors");
 const postRouter = require("./routes/post");
 const authRouter = require("./routes/auth");
 const multer = require("multer");
+const db = require("./config/config");
+require("dotenv/config");
 
-dotenv.config({ path: "./.env" });
-const port = process.env.PORT;
+const port = process.env.port;
 
 const dbURI = process.env.DBURI;
 
 const app = express();
-
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -39,27 +39,13 @@ const fileFilter = (req, file, cb) => {
 
 app.use(cors());
 app.use(express.json());
-app.use(multer({storage: storage, fileFilter: fileFilter}).single("image"))
-app.use("/images", express.static(path.join(__dirname, "images")))
+app.use(multer({ storage: storage, fileFilter: fileFilter }).single("image"));
+app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(authRouter);
 app.use(postRouter);
 
+db();
 
-
-mongoose
-  .connect(dbURI)
-  .then((res) => {
-    app.listen(port, () => {
-      console.log(`connected to server 127.0.0.0:${port}`);
-    });
-  })
-  .catch(
-    (err) => {
-      console.log(err);
-    },
-    { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }
-  );
-
-mongoose.connection.on("open", () => {
-  console.log("connected to database");
+app.listen(port, () => {
+  console.log(`server running at ${port}`);
 });

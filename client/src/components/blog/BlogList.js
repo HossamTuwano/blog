@@ -1,27 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+
+import { DataContext } from "../../context/getData";
 
 function BlogList({ blogs, title }) {
-  const [blog, setBlog] = useState([]);
+  const { data, loading, error } = useContext(DataContext);
 
-  useEffect(() => {
-    const res = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/posts", {
-          method: "get",
-          headers: { "Content-Types": "application/json" },
-        });
-
-        const data = await response.json();
-        setBlog(data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    res();
-  }, []);
+  if (loading) return "Loading...";
+  const blog = data;
 
   return (
     <div className="">
